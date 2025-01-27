@@ -108,8 +108,9 @@ func (action actionPessimisticLock) handleSingleBatch(
 		c.txn.GetMemBuffer().RLock()
 		for i := 0; i < committerMutations.Len(); i++ {
 			mut := &kvrpcpb.Mutation{
-				Op:  kvrpcpb.Op_PessimisticLock,
-				Key: committerMutations.GetKey(i),
+				Op:    kvrpcpb.Op_PessimisticLock,
+				Key:   committerMutations.GetKey(i),
+				Guard: []byte("dummy-guard"),
 			}
 			if c.txn.us.HasPresumeKeyNotExists(committerMutations.GetKey(i)) {
 				mut.Assertion = kvrpcpb.Assertion_NotExist

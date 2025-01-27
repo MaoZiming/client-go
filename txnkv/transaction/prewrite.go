@@ -97,6 +97,7 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 			Key:       m.GetKey(i),
 			Value:     m.GetValue(i),
 			Assertion: assertion,
+			Guard:     []byte("dummy-guard"),
 		}
 		if m.IsPessimisticLock(i) {
 			pessimisticActions[i] = kvrpcpb.PrewriteRequest_DO_PESSIMISTIC_CHECK

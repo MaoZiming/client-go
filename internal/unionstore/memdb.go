@@ -284,6 +284,11 @@ func (db *MemDB) GetKeyByHandle(handle MemKeyHandle) []byte {
 	return x.getKey()
 }
 
+func (db *MemDB) GetGuardByHandle(handle MemKeyHandle) []byte {
+	x := db.getNode(handle.toAddr())
+	return x.getGuard()
+}
+
 // GetValueByHandle returns value by handle.
 func (db *MemDB) GetValueByHandle(handle MemKeyHandle) ([]byte, bool) {
 	if db.vlogInvalid {
