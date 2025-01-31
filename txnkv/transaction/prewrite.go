@@ -187,6 +187,8 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 		req.GuardValue = "default-prewrite"
 	}
 
+	fmt.Printf("PrewriteRequest: %+v\n", req)
+
 	if _, err := util.EvalFailpoint("invalidMaxCommitTS"); err == nil {
 		if req.MaxCommitTs > 0 {
 			req.MaxCommitTs = minCommitTS - 1
@@ -221,6 +223,9 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 	if c.resourceGroupTag == nil && c.resourceGroupTagger != nil {
 		c.resourceGroupTagger(r)
 	}
+
+	fmt.Printf("r := tikvrpc.NewRequest: %+v\n", r)
+
 	return r
 }
 
@@ -306,7 +311,7 @@ func (action actionPrewrite) handleSingleBatch(
 			tBegin = time.Now()
 		}
 
-		fmt.Println("sender.SendReq: ", req)
+		fmt.Printf("sender.SendReq PrewriteRequest: %+v\n", req)
 
 		resp, retryTimes, err := sender.SendReq(bo, req, batch.region, client.ReadTimeoutShort)
 		// Unexpected error occurs, return it
