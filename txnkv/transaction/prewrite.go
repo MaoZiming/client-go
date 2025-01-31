@@ -183,6 +183,10 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 		GuardValue:             c.guardValue,
 	}
 
+	if req.GuardValue == "" {
+		req.GuardValue = "default-prewrite"
+	}
+
 	if _, err := util.EvalFailpoint("invalidMaxCommitTS"); err == nil {
 		if req.MaxCommitTs > 0 {
 			req.MaxCommitTs = minCommitTS - 1
@@ -301,6 +305,8 @@ func (action actionPrewrite) handleSingleBatch(
 			)
 			tBegin = time.Now()
 		}
+
+		fmt.Println("sender.SendReq: ", req)
 
 		resp, retryTimes, err := sender.SendReq(bo, req, batch.region, client.ReadTimeoutShort)
 		// Unexpected error occurs, return it

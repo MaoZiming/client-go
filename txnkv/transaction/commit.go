@@ -92,6 +92,11 @@ func (action actionCommit) handleSingleBatch(c *twoPhaseCommitter, bo *retry.Bac
 			ResourceGroupName: c.resourceGroupName,
 		},
 	})
+
+	if req.Commit().GuardValue == "" {
+		req.Commit().GuardValue = "default-commit"
+	}
+
 	if c.resourceGroupTag == nil && c.resourceGroupTagger != nil {
 		c.resourceGroupTagger(req)
 	}
