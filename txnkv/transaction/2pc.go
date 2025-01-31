@@ -39,6 +39,7 @@ import (
 	"context"
 	"encoding/hex"
 	errors2 "errors"
+	"fmt"
 	"math"
 	"math/rand"
 	"strconv"
@@ -136,6 +137,7 @@ type twoPhaseCommitter struct {
 	txnSize             int
 	hasNoNeedCommitKeys bool
 	resourceGroupName   string
+	guardValue          string
 
 	primaryKey  []byte
 	forUpdateTS uint64
@@ -923,6 +925,7 @@ func (c *twoPhaseCommitter) doActionOnGroupMutations(bo *retry.Backoffer, action
 	action.tiKVTxnRegionsNumHistogram().Observe(float64(len(groups)))
 
 	var sizeFunc = c.keySize
+	fmt.Println("GuardValue at doActionOnGroupMutations:", c.guardValue)
 
 	switch act := action.(type) {
 	case actionPrewrite:
@@ -1409,6 +1412,11 @@ func (c *twoPhaseCommitter) cleanup(ctx context.Context) {
 // execute executes the two-phase commit protocol.
 func (c *twoPhaseCommitter) execute(ctx context.Context) (err error) {
 	var binlogSkipped bool
+
+	guardValue_, _ := ctx.Value("guardValue").(string)
+	fmt.Println("GuardValue at KVTxn.Commit:", guardValue_)
+	c.guardValue = guardValue_
+
 	defer func() {
 		if c.isOnePC() {
 			// The error means the 1PC transaction failed.

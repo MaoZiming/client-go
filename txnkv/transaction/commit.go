@@ -36,6 +36,7 @@ package transaction
 
 import (
 	"encoding/hex"
+	"fmt"
 	"time"
 
 	"github.com/opentracing/opentracing-go"
@@ -71,11 +72,14 @@ func (action actionCommit) tiKVTxnRegionsNumHistogram() prometheus.Observer {
 }
 
 func (action actionCommit) handleSingleBatch(c *twoPhaseCommitter, bo *retry.Backoffer, batch batchMutations) error {
+
+	fmt.Println("GuardValue at handleSingleBatch (actionCommit):", c.guardValue)
 	keys := batch.mutations.GetKeys()
 	req := tikvrpc.NewRequest(tikvrpc.CmdCommit, &kvrpcpb.CommitRequest{
 		StartVersion:  c.startTS,
 		Keys:          keys,
 		CommitVersion: c.commitTS,
+		GuardValue:    c.guardValue,
 	}, kvrpcpb.Context{
 		Priority:               c.priority,
 		SyncLog:                c.syncLog,

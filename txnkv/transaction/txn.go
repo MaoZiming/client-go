@@ -409,6 +409,10 @@ func (txn *KVTxn) Commit(ctx context.Context) error {
 		defer span1.Finish()
 		ctx = opentracing.ContextWithSpan(ctx, span1)
 	}
+
+	guardValue_, _ := ctx.Value("guardValue").(string)
+	fmt.Println("GuardValue at KVTxn.Commit:", guardValue_)
+
 	defer trace.StartRegion(ctx, "CommitTxn").End()
 
 	if !txn.valid {

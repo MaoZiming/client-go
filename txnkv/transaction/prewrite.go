@@ -36,6 +36,7 @@ package transaction
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math"
 	"strconv"
 	"sync/atomic"
@@ -179,6 +180,7 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 		MaxCommitTs:            c.maxCommitTS,
 		AssertionLevel:         assertionLevel,
 		ForUpdateTsConstraints: forUpdateTSConstraints,
+		GuardValue:             c.guardValue,
 	}
 
 	if _, err := util.EvalFailpoint("invalidMaxCommitTS"); err == nil {
@@ -226,6 +228,8 @@ func (action actionPrewrite) handleSingleBatch(
 	// regionErr, it's uncertain if the request will be splitted into multiple and sent to multiple
 	// regions. It invokes `prewriteMutations` recursively here, and the number of batches will be
 	// checked there.
+
+	fmt.Println("GuardValue at handleSingleBatch (actionPrewrite):", c.guardValue)
 
 	if c.sessionID > 0 {
 		if batch.isPrimary {
