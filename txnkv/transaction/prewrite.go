@@ -187,6 +187,19 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 		req.GuardValue = "default-prewrite"
 	}
 
+	fmt.Printf("Mutations: %+v\n", req.Mutations)
+	fmt.Printf("PrimaryLock: %s\n", req.PrimaryLock)
+	fmt.Printf("StartVersion: %d\n", req.StartVersion)
+	fmt.Printf("LockTtl: %d\n", req.LockTtl)
+	fmt.Printf("PessimisticActions: %+v\n", req.PessimisticActions)
+	fmt.Printf("ForUpdateTs: %d\n", req.ForUpdateTs)
+	fmt.Printf("TxnSize: %d\n", req.TxnSize)
+	fmt.Printf("MinCommitTs: %d\n", req.MinCommitTs)
+	fmt.Printf("MaxCommitTs: %d\n", req.MaxCommitTs)
+	fmt.Printf("AssertionLevel: %+v\n", req.AssertionLevel)
+	fmt.Printf("ForUpdateTsConstraints: %+v\n", req.ForUpdateTsConstraints)
+	fmt.Printf("GuardValue: %s\n", req.GuardValue)
+
 	fmt.Printf("PrewriteRequest: %+v\n", req)
 
 	if _, err := util.EvalFailpoint("invalidMaxCommitTS"); err == nil {
