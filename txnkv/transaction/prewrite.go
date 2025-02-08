@@ -36,7 +36,6 @@ package transaction
 
 import (
 	"encoding/hex"
-	"fmt"
 	"math"
 	"strconv"
 	"sync/atomic"
@@ -187,21 +186,6 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 		req.GuardValue = "default-prewrite"
 	}
 
-	fmt.Printf("Mutations: %+v\n", req.Mutations)
-	fmt.Printf("PrimaryLock: %s\n", req.PrimaryLock)
-	fmt.Printf("StartVersion: %d\n", req.StartVersion)
-	fmt.Printf("LockTtl: %d\n", req.LockTtl)
-	fmt.Printf("PessimisticActions: %+v\n", req.PessimisticActions)
-	fmt.Printf("ForUpdateTs: %d\n", req.ForUpdateTs)
-	fmt.Printf("TxnSize: %d\n", req.TxnSize)
-	fmt.Printf("MinCommitTs: %d\n", req.MinCommitTs)
-	fmt.Printf("MaxCommitTs: %d\n", req.MaxCommitTs)
-	fmt.Printf("AssertionLevel: %+v\n", req.AssertionLevel)
-	fmt.Printf("ForUpdateTsConstraints: %+v\n", req.ForUpdateTsConstraints)
-	fmt.Printf("GuardValue: %s\n", req.GuardValue)
-
-	fmt.Printf("PrewriteRequest: %+v\n", req)
-
 	if _, err := util.EvalFailpoint("invalidMaxCommitTS"); err == nil {
 		if req.MaxCommitTs > 0 {
 			req.MaxCommitTs = minCommitTS - 1
@@ -236,9 +220,6 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 	if c.resourceGroupTag == nil && c.resourceGroupTagger != nil {
 		c.resourceGroupTagger(r)
 	}
-
-	fmt.Printf("r := tikvrpc.NewRequest: %+v\n", r)
-
 	return r
 }
 
@@ -250,8 +231,6 @@ func (action actionPrewrite) handleSingleBatch(
 	// regionErr, it's uncertain if the request will be splitted into multiple and sent to multiple
 	// regions. It invokes `prewriteMutations` recursively here, and the number of batches will be
 	// checked there.
-
-	fmt.Println("GuardValue at handleSingleBatch (actionPrewrite):", c.guardValue)
 
 	if c.sessionID > 0 {
 		if batch.isPrimary {
@@ -323,8 +302,6 @@ func (action actionPrewrite) handleSingleBatch(
 			)
 			tBegin = time.Now()
 		}
-
-		fmt.Printf("sender.SendReq PrewriteRequest: %+v\n", req)
 
 		resp, retryTimes, err := sender.SendReq(bo, req, batch.region, client.ReadTimeoutShort)
 		// Unexpected error occurs, return it

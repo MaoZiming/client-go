@@ -567,9 +567,6 @@ func (s *KVSnapshot) Get(ctx context.Context, k []byte) ([]byte, error) {
 
 	ctx = context.WithValue(ctx, retry.TxnStartKey, s.version)
 
-	guardValue_, _ := ctx.Value("guardValue").(string)
-	fmt.Println("GuardValue at KVSnapshot.Get:", guardValue_)
-
 	if ctx.Value(util.RequestSourceKey) == nil {
 		ctx = context.WithValue(ctx, util.RequestSourceKey, *s.RequestSource)
 	}
@@ -630,7 +627,6 @@ func (s *KVSnapshot) get(ctx context.Context, bo *retry.Backoffer, k []byte) ([]
 	}
 
 	guardValue_, _ := ctx.Value("guardValue").(string)
-	fmt.Println("GuardValue at KVSnapshot.get:", guardValue_)
 
 	req := tikvrpc.NewReplicaReadRequest(tikvrpc.CmdGet,
 		&kvrpcpb.GetRequest{
