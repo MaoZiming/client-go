@@ -1096,6 +1096,19 @@ func (c *RegionCache) LocateEndKey(bo *retry.Backoffer, key []byte) (*KeyLocatio
 
 func (c *RegionCache) findRegionByKey(bo *retry.Backoffer, key []byte, isEndKey bool) (r *Region, err error) {
 	r = c.searchCachedRegion(key, isEndKey)
+
+	if r != nil && r.meta.Id == 186 {
+		fmt.Printf("findRegionByKey:\n"+
+			"  RegionID   = %d\n"+
+			"  Key        = %s (Hex: %s)\n"+
+			"  StartKey   = %s (Hex: %s)\n"+
+			"  EndKey     = %s (Hex: %s)\n",
+			r.meta.Id,
+			string(key), hex.EncodeToString(key),
+			string(r.meta.StartKey), hex.EncodeToString(r.meta.StartKey),
+			string(r.meta.EndKey), hex.EncodeToString(r.meta.EndKey),
+		)
+	}
 	if r == nil {
 		// load region when it is not exists or expired.
 		lr, err := c.loadRegion(bo, key, isEndKey)
