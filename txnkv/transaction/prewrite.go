@@ -36,6 +36,7 @@ package transaction
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math"
 	"strconv"
 	"sync/atomic"
@@ -83,6 +84,8 @@ func (c *twoPhaseCommitter) buildPrewriteRequest(batch batchMutations, txnSize u
 	mutations := make([]*kvrpcpb.Mutation, m.Len())
 	pessimisticActions := make([]kvrpcpb.PrewriteRequest_PessimisticAction, m.Len())
 	var forUpdateTSConstraints []*kvrpcpb.PrewriteRequest_ForUpdateTSConstraint
+
+	fmt.Println("buildPrewriteRequest: ", batch.region.GetID())
 
 	for i := 0; i < m.Len(); i++ {
 		assertion := kvrpcpb.Assertion_None
